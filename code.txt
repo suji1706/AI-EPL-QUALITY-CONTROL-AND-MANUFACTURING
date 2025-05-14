@@ -1,0 +1,54 @@
+import random
+
+class Product:
+    def __init__(self, id, ideal_weight, tolerance):
+        self.id = id
+        self.ideal_weight = ideal_weight
+        self.tolerance = tolerance
+        self.actual_weight = self.generate_weight()
+        self.is_defective = not self.check_quality()
+
+    def generate_weight(self):
+        # Simulate actual weight with some variation
+        return round(random.uniform(self.ideal_weight - 2 * self.tolerance,
+                                    self.ideal_weight + 2 * self.tolerance), 2)
+
+    def check_quality(self):
+        # Check if the actual weight is within the acceptable tolerance
+        return (self.ideal_weight - self.tolerance) <= self.actual_weight <= (self.ideal_weight + self.tolerance)
+
+    def __str__(self):
+        status = "OK" if not self.is_defective else "DEFECTIVE"
+        return f"Product ID: {self.id}, Weight: {self.actual_weight}g, Status: {status}"
+
+class QualityControl:
+    def __init__(self, batch_size, ideal_weight, tolerance):
+        self.batch_size = batch_size
+        self.ideal_weight = ideal_weight
+        self.tolerance = tolerance
+        self.products = self.create_batch()
+        self.defective_count = self.count_defective()
+        self.report()
+
+    def create_batch(self):
+        return [Product(i+1, self.ideal_weight, self.tolerance) for i in range(self.batch_size)]
+
+    def count_defective(self):
+        return sum(1 for p in self.products if p.is_defective)
+
+    def report(self):
+        print("QUALITY CONTROL REPORT")
+        print("-" * 40)
+        for p in self.products:
+            print(p)
+        print("-" * 40)
+        print(f"Total Products: {self.batch_size}")
+        print(f"Defective Products: {self.defective_count}")
+        print(f"Defect Rate: {self.defective_count / self.batch_size * 100:.2f}%")
+
+# Example usage:
+if __name__ == "__main__":
+    batch_size = 20
+    ideal_weight = 100  # in grams
+    tolerance = 2.5     # +/- grams tolerance
+    qc = QualityControl(batch_size, ideal_weight, tolerance)
